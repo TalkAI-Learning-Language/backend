@@ -1,7 +1,10 @@
 import uuid
 from datetime import datetime
+
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
+from typing_extensions import Optional, List
+
 
 class User(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
@@ -11,15 +14,15 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, index=True, max_length=255)
     password: str = Field(min_length=8, max_length=128)
     native_language: str | None = Field(default=None, max_length=64)
-    purpose_language: str | None = Field(default=None, max_length=64)
+    purpose_language: str | None = Field(default=None, max_length=256)
     reason: str | None = Field(default=None, max_length=255)
     time: int | None = Field(default=None, description="Learning time in minutes")
-    teacher: str | None = Field(default=None, max_length=255)
-    current_lesson: str | None = Field(default=None, max_length=255)
+    teacher: str | None = Field(default=None, max_length=255)  # teacher id
+    current_lesson: str | None = Field(default=None, max_length=255) # lesson id
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     extra_minute: int | None = Field(default=0)
-    membership: str | None = Field(default=None, max_length=64)
+    membership: int | None = Field(default=0)
 
 # Shared properties
 class UserBase(SQLModel):
@@ -28,13 +31,13 @@ class UserBase(SQLModel):
     is_superuser: bool = False
     name: Optional[str] = Field(default=None, max_length=255)
     native_language: Optional[str] = Field(default=None, max_length=64)
-    purpose_language: Optional[str] = Field(default=None, max_length=64)
+    purpose_language: Optional[str] = Field(default=None, max_length=256)
     reason: Optional[str] = Field(default=None, max_length=255)
     time: Optional[int] = Field(default=None, description="Learning time in minutes")
     teacher: Optional[str] = Field(default=None, max_length=255)
     current_lesson: Optional[str] = Field(default=None, max_length=255)
     extra_minute: Optional[int] = Field(default=0)
-    membership: Optional[str] = Field(default=None, max_length=64)
+    membership: Optional[int] = Field(default=0)
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
@@ -48,6 +51,7 @@ class UserRegister(SQLModel):
     native_language: Optional[str] = Field(default=None, max_length=64)
     purpose_language: Optional[str] = Field(default=None, max_length=64)
     reason: Optional[str] = Field(default=None, max_length=255)
+    time: int | None = Field(default=None, description="Learning time in minutes")
 
 # Properties to receive via API on update, all are optional
 class UserUpdate(UserBase):
@@ -61,15 +65,6 @@ class UserUpdateMe(SQLModel):
     purpose_language: Optional[str] = Field(default=None, max_length=64)
     reason: Optional[str] = Field(default=None, max_length=255)
 
-# Database model
-class User(UserBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
-    hashed_password: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-    # Example relationship if you have items
-    # items: List["Item"] = Relationship(back_populates="owner", sa_relationship_kwargs={"cascade": "all, delete"})
-
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
@@ -77,3 +72,7 @@ class UserPublic(UserBase):
 class UsersPublic(SQLModel):
     data: List[UserPublic]
     count: int
+
+class UpdatePassword(SQLModel):
+    current_password: str
+    new_password: str
