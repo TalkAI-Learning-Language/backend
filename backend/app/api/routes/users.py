@@ -2,6 +2,7 @@ import uuid
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
+from requests import Session
 from sqlmodel import col, delete, func, select
 
 from app import crud
@@ -9,6 +10,8 @@ from app.api.deps import (
     CurrentUser,
     SessionDep,
     get_current_active_superuser,
+    get_current_user,
+    get_db,
 )
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
@@ -20,7 +23,7 @@ from app.model.user import (
     UserRegister,
     UsersPublic,
     UserUpdate,
-    UserUpdateMe,
+    UserUpdateMe, SelectTeacherRequest, SelectLanguageRequest,
 )
 from app.models import (
     Item,
@@ -226,3 +229,26 @@ def delete_user(
     session.delete(user)
     session.commit()
     return Message(message="User deleted successfully")
+
+
+@router.patch("/me/teacher", response_model=UserPublic)
+def select_teacher(
+    req: SelectTeacherRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.teacher = req.teacher
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+@router.patch("/me/purpose_language", response_model=UserPublic)
+def select_teacher(
+    req: SelectLanguageRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.purpose_language = req.language
+    db.commit()
+    db.refresh(current_user)
+    return current_user

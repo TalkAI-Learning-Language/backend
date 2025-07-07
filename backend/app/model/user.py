@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from pydantic import EmailStr
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 from typing_extensions import Optional, List
 
 
@@ -23,6 +23,8 @@ class User(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     extra_minute: int | None = Field(default=0)
     membership: int | None = Field(default=0)
+    hashed_password: str
+    items: list["Item"] = Relationship(back_populates="owner")
 
 # Shared properties
 class UserBase(SQLModel):
@@ -76,3 +78,9 @@ class UsersPublic(SQLModel):
 class UpdatePassword(SQLModel):
     current_password: str
     new_password: str
+
+class SelectTeacherRequest(SQLModel):
+    teacher: str  # or UUID if you use UUIDs for teacher IDs
+
+class SelectLanguageRequest(SQLModel):
+    language: str  # or UUID if you use UUIDs for teacher IDs
