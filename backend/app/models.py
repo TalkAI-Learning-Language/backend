@@ -1,5 +1,6 @@
 import uuid
-
+from app.model.lesson import Lesson
+from app.model.progress_lesson import ProgressLesson
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 from app.model.user import User

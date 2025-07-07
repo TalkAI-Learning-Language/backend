@@ -26,3 +26,10 @@ class Time(int, Enum):
     twenty_min = 3
     thirty_min = 4
 
+@unique
+class LessonStatus(int, Enum):
+    disable = 0
+    active = 1
+    in_progress = 2
+    completed = 3
+

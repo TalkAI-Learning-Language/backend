@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from email.policy import default
 
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel, Relationship
@@ -23,7 +24,7 @@ class User(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     extra_minute: int | None = Field(default=0)
     membership: int | None = Field(default=0)
-    hashed_password: str
+    hashed_password: str = Field(default=None, nullable=True)
     items: list["Item"] = Relationship(back_populates="owner")
 
 # Shared properties
