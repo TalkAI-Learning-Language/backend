@@ -1,9 +1,10 @@
 import uuid
-from email.policy import default
 
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel
+from typing_extensions import Optional, List
 
 from app.constants import LessonStatus
+from app.model.lesson import Lesson
 
 
 # Shared properties
@@ -40,4 +41,16 @@ class ProgressLessonPublic(ProgressLessonBase):
 
 class ProgressLessonsPublic(SQLModel):
     data: list[ProgressLessonPublic]
+    count: int
+
+class ProgressLessonWithLesson(SQLModel):
+    progress: ProgressLesson
+    lesson: Lesson
+
+class LessonWithProgress(SQLModel):
+    lesson: Lesson
+    progress: Optional[ProgressLesson]  # Will be None if no progress
+
+class LessonsWithProgressResponse(SQLModel):
+    data: List[LessonWithProgress]
     count: int
