@@ -1,7 +1,7 @@
 import uuid
 from app.model.lesson import Lesson
 from app.model.progress_lesson import ProgressLesson
-from pydantic import EmailStr
+from pydantic import EmailStr, BaseModel
 from sqlmodel import Field, Relationship, SQLModel
 from app.model.user import User
 
@@ -62,3 +62,14 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+class ChatRequest(BaseModel):
+    message: str
+    history: str
+
+class ChatResponse(BaseModel):
+    message: str
+
+class VoiceChatResponse(BaseModel):
+    audio_url: str  # or you can return audio bytes directly
+    text: str
